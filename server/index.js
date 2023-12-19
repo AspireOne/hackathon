@@ -15,6 +15,10 @@ const openRouterAi = new OpenAI({
   apiKey: process.env.OPENROUTER_API_KEY,
 })
 
+const aiNick = "@pometlussy";
+
+const messages = [];
+
 const app = express();
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
@@ -25,28 +29,29 @@ wss.on('connection', function connection(ws) {
   ws.on('message', async function incoming(data) {
     const message = JSON.parse(data);
     console.log('received: %s', message);
+    messages.push(message);
 
     // Assign an ID to each message
     const messageId = uuidv4();
     message.id = messageId;
-
     // Broadcast the message to everyone else.
-    wss.clients.forEach(function each(client) {
-      client.send(JSON.stringify(message));
-    });
+    broadcastMessage(message);
 
     // Perform sentiment analysis
+    let sentiment;
     try {
-      const sentiment = await getSentiment(message.message);
+      sentiment = await getSentiment(message.message);
       console.log("sentiment: ", sentiment);
-
-      // Broadcast the sentiment result to all clients with the message ID
-      const sentimentMessage = { id: messageId, sentiment: sentiment.trim() };
-      wss.clients.forEach(function each(client) {
-        client.send(JSON.stringify(sentimentMessage));
-      });
     } catch (error) {
       console.error('Error performing sentiment analysis:', error);
+    }
+
+    const sentimentMessage = { id: messageId, sentiment: sentiment.trim() };
+    broadcastMessage(sentimentMessage);
+
+    if (message.message.includes(aiNick)) {
+      const aiMessage = await generateAiMessage();
+      broadcastAiMessage(aiMessage);
     }
   });
 });
@@ -69,6 +74,52 @@ async function getSentiment(message) {
   });
 
   return response.choices[0].message.content;
+}
+
+async function generateAiMessage() {
+  const last8messages = messages.slice(-8);
+  const formattedMessages = last8messages.map((message) => {
+    return `${message.sender}: ${message.message}`;
+  }).join('\n');
+
+  const response = await openRouterAi.chat.completions.create({
+    model: 'gpt-3.5-turbo',
+    messages: [
+      {
+        role: 'system',
+        content: `You are roleplaying user in an online realtime chat. Your nick is "${aiNick}". ` +
+          'Have a conversation with other users, reply to them messages, and comment on their messages. ' +
+          'Be irritated, toxic, funny, direct, and vulgar.',
+      },
+      {
+        role: 'user',
+        content: formattedMessages + "\n" + aiNick + ":"
+      }
+    ],
+    temperature: 0.9,
+  });
+
+  console.log("open router response: ", response);
+
+  return response.choices[0].message.content;
+}
+
+function broadcastAiMessage(content) {
+  const message = {
+    id: uuidv4(),
+    sender: aiNick,
+    message: content,
+    timestamp: new Date().toISOString(),
+  };
+
+  messages.push(message);
+  broadcastMessage(message);
+}
+
+function broadcastMessage(message) {
+  wss.clients.forEach(function each(client) {
+    client.send(JSON.stringify(message));
+  });
 }
 
 // Serve any static files
