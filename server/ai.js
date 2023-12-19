@@ -60,6 +60,6 @@ async function generateAiMessage(messages, aiNick) {
 }
 
 export const ai = {
-  getSentiment,
+  retrieveSentiment: getSentiment,
   generateAiMessage,
 }
