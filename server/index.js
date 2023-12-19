@@ -3,10 +3,11 @@ import express from 'express';
 import http from 'http';
 import OpenAI from 'openai';
 import { v4 as uuidv4 } from 'uuid';
+import 'dotenv/config'
 
 // Make sure to set your OpenAI API key in an environment variable for security
 const openai = new OpenAI({
-  apiKey: "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",
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 const app = express();
