@@ -10,6 +10,11 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+const openRouterAi = new OpenAI({
+  baseURL: "https://openrouter.ai/api/v1",
+  apiKey: process.env.OPENROUTER_API_KEY,
+})
+
 const app = express();
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server });

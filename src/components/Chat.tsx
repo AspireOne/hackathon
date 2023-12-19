@@ -35,7 +35,7 @@ const Chat: React.FC = () => {
 
   // Establish WebSocket connection
   useEffect(() => {
-    ws.current = new WebSocket(constants.serverUrl);
+    ws.current = new WebSocket(constants.wsServerUrl);
     ws.current.onopen = () => console.log('WebSocket opened');
 
     ws.current.onmessage = (e) => {
