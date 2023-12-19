@@ -29,9 +29,6 @@ setInterval(async () => {
 wss.on('connection', function connection(ws) {
   console.log('A new client connected!');
 
-  const last20Messages = messages.get(20);
-  ws.send(JSON.stringify(last20Messages));
-
   ws.on('message', async function incoming(data) {
     const rateLimitResult = rateLimiter.attempt(data.sender);
 
@@ -46,6 +43,15 @@ wss.on('connection', function connection(ws) {
     } catch (error) {
       console.error('Error parsing message:', error);
       return
+    }
+
+    if (message.request) {
+      if (message.request === "history") {
+        const last20Messages = messages.get(20);
+        console.log('Sending last 20 messages to new client:', last20Messages);
+        ws.send(JSON.stringify(last20Messages));
+      }
+      return;
     }
 
     console.log('received: %s', message);

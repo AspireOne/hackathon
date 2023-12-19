@@ -11,13 +11,13 @@ const App: React.FC = () => {
         <h1 className="text-4xl font-bold">WebSocket Chat</h1>
         <p className={"text-gray-200 mt-2"}>Pometlussy is always here. Summon him using @pometlussy.</p>
       </header>
-      <main className="flex justify-center p-10">
-        <div className="w-4/6 bg-white shadow-lg rounded-lg overflow-hidden mr-4">
+      <main className="flex justify-center p-2 md:p-10">
+        <div className="w-full md:w-4/6 bg-white shadow-lg rounded-lg overflow-hidden mr-4">
           {
             nick ? <Chat nick={nick} /> : <ChooseNickModal onNickSet={setNick}/>
           }
         </div>
-        <div className="w-1/6">
+        <div className="w-1/6 hidden md:block">
           <div className="bg-white shadow-lg rounded-lg overflow-hidden sticky top-10 p-6 h-96 overflow-y-auto">
             <Guess />
           </div>

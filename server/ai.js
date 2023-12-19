@@ -39,7 +39,7 @@ async function generateAiMessage(messages, aiNick) {
   }).join('\n');
 
   const response = await openRouterAi.chat.completions.create({
-    model: 'mistralai/mixtral-8x7b-instruct',
+    model: 'nousresearch/nous-hermes-llama2-70b',
     messages: [
       {
         role: 'system',
@@ -49,10 +49,10 @@ async function generateAiMessage(messages, aiNick) {
       },
       {
         role: 'user',
-        content: formattedMessages + "\n" + aiNick + ":"
+        content: "Here is the chat history:\n\"\"\"\n" + formattedMessages + "\n\"\"\"\n" + "your next message:"
       }
     ],
-    temperature: 0.9,
+    temperature: 0.85,
     max_tokens: 300,
   });
 

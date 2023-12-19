@@ -6,6 +6,8 @@ import { twMerge } from "tailwind-merge";
 export type Sentiment = "positive" | "negative" | "profane" | "neutral";
 
 const ws = new WebSocket(constants.wsServerUrl);
+ws.onopen = () => console.log("WebSocket opened");
+ws.onclose = () => console.log("WebSocket closed");
 
 // Component for Chat
 const Chat = (props: {nick: string}) => {
@@ -16,12 +18,15 @@ const Chat = (props: {nick: string}) => {
   useEffect(() => {
     window.addEventListener("beforeunload", () => ws?.close());
 
-    ws.onopen = () => console.log("WebSocket opened");
-    ws.onclose = () => console.log("WebSocket closed");
+    ws.send(JSON.stringify({
+      request: "history",
+    }));
+
     ws.onmessage = (e) => {
       const data = JSON.parse(e.data);
 
       // When server sends initial messages.
+      console.log("received data: ", data);
       if (Array.isArray(data)) {
         setMessages(data);
         return;
@@ -67,7 +72,7 @@ const Chat = (props: {nick: string}) => {
 
   // Render the chat UI.
   return (
-    <div className="chat-container flex flex-col justify-between border h-[70vh]">
+    <div className="chat-container flex flex-col justify-between border h-[80vh] md:h-[70vh]">
       <div className="messages-list overflow-auto flex-grow">
         {messages.map((msg) => (
           <Message key={msg.id} msg={msg} />
