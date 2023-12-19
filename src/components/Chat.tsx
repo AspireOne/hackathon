@@ -52,7 +52,11 @@ const Chat: React.FC = () => {
         // This is a regular message
         setMessages((prevMessages) => [...prevMessages, data]);
         if (data.message.startsWith("/")) {
-          
+          // if correct:
+          /*ws.current!.send(JSON.stringify({
+            type: "correct-guess", // or wrong-guess
+            ...data
+          }));*/
         }
       }
     };
