@@ -83,13 +83,13 @@ async function generateAiMessage() {
   }).join('\n');
 
   const response = await openRouterAi.chat.completions.create({
-    model: 'gpt-3.5-turbo',
+    model: 'gryphe/mythomist-7b',
     messages: [
       {
         role: 'system',
-        content: `You are roleplaying user in an online realtime chat. Your nick is "${aiNick}". ` +
-          'Have a conversation with other users, reply to them messages, and comment on their messages. ' +
-          'Be irritated, toxic, funny, direct, and vulgar.',
+        content: `You are user in a group chat. Your nick is "${aiNick}". ` +
+          'Have a conversation with others, reply to their messages, and comment on the chat\'s situation. ' +
+          'Be direct, funny, and toxic. Use profanity. Your message must be 4 sentences max.',
       },
       {
         role: 'user',
@@ -97,6 +97,7 @@ async function generateAiMessage() {
       }
     ],
     temperature: 0.9,
+    max_tokens: 300,
   });
 
   console.log("open router response: ", response);
