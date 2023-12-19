@@ -30,15 +30,16 @@ const App: React.FC = () => {
 const ChooseNickModal = (props: {onNickSet: (nick: string) => void}) => {
   const [nick, setNick] = React.useState<string>("");
 
-  const onSubmit = () => {
-    if (nick && nick.length > 3) {
+  const onSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (nick && nick.length > 3 && !nick.includes(" ")) {
       props.onNickSet(nick);
     }
   }
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-10">
-      <div className="bg-white p-6 rounded-lg shadow-lg">
+      <form className="bg-white p-6 rounded-lg shadow-lg">
         <h1 className="text-2xl font-bold mb-4">Choose a nickname</h1>
         <input
           type="text"
@@ -52,7 +53,7 @@ const ChooseNickModal = (props: {onNickSet: (nick: string) => void}) => {
         >
           Join
         </button>
-      </div>
+      </form>
     </div>
   );
 }
