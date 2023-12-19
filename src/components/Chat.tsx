@@ -4,8 +4,6 @@ import { CgDanger, CgSmile, CgSmileNeutral } from "react-icons/cg";
 import { FaRegFaceAngry } from "react-icons/fa6";
 import { twMerge } from "tailwind-merge";
 
-const username = `User${Math.floor(Math.random() * 1000000)}`;
-
 type Sentiment = "positive" | "negative" | "profane" | "neutral";
 
 // Extended interface to include sentiment and id
@@ -48,7 +46,7 @@ const getSentimentIcon = (sentiment?: Sentiment) => {
 };
 
 // Component for Chat
-const Chat: React.FC = () => {
+const Chat = (props: {nick: string}) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const ws = useRef<WebSocket | null>(null);
@@ -92,7 +90,7 @@ const Chat: React.FC = () => {
   const sendMessage = () => {
     if (input.trim() !== "" && ws.current) {
       const messageToSend: Omit<ChatMessage, "id"> = {
-        sender: username,
+        sender: props.nick,
         message: input,
         timestamp: new Date().toISOString(),
       };
