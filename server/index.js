@@ -69,6 +69,7 @@ async function getSentiment(message) {
 // Serve any static files
 // app.use(express.static('path-to-your-react-app-build'));
 
-server.listen(3001, function listening() {
-  console.log('Listening on 3001');
+const port = process.env.PORT || 3001; //  Railway provides port as .env variable.
+server.listen(port, function listening() {
+  console.log(`Listening on ${port}`);
 });

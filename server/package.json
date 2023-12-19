@@ -5,7 +5,7 @@
   "main": "src/index.ts",
   "type": "module",
   "scripts": {
-    "start": "node index.ts",
+    "start": "node index.js",
     "dev": "nodemon index.js"
   },
   "keywords": [],
