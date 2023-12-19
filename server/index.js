@@ -1,27 +1,17 @@
 import { WebSocketServer } from "ws";
 import express from 'express';
 import http from 'http';
-import OpenAI from 'openai';
 import { v4 as uuidv4 } from 'uuid';
 import 'dotenv/config'
 import {Messages} from "./Messages.js";
 import {RateLimiter} from "./RateLimiter.js";
+import { ai } from "./ai.js";
 
-// Make sure to set your OpenAI API key in an environment variable for security
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
-const openRouterAi = new OpenAI({
-  baseURL: "https://openrouter.ai/api/v1",
-  apiKey: process.env.OPENROUTER_API_KEY,
-})
 
 const aiNick = "@pometlussy";
-
 const messages = new Messages({max: 50});
 
-// Instantiate RateLimiter with a limit of 5 messages per 5 seconds for each user
+// 5 messages / 5 seconds for each user.
 const rateLimiter = new RateLimiter(5, 5 * 1000);
 
 const app = express();
@@ -29,15 +19,9 @@ const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
 
 setInterval(async () => {
-  const send = messages.getLast()?.sender && messages.getLast()?.sender !== aiNick;
-
-  console.log("last msg: ", messages.getLast());
-  console.log("last msg sender: ", messages.getLast()?.sender);
-  console.log("aiNick: ", aiNick)
-  console.log("send msg: ", send);
-
-  if (send) {
-    const aiMsg = await generateAiMessage();
+  const sendAiMessage = messages.getLast()?.sender && messages.getLast()?.sender !== aiNick;
+  if (sendAiMessage) {
+    const aiMsg = await ai.generateAiMessage(messages, aiNick);
     broadcastAiMessage(aiMsg);
   }
 }, 20_000);
@@ -76,7 +60,7 @@ wss.on('connection', function connection(ws) {
     // Perform sentiment analysis
     let sentiment;
     try {
-      sentiment = await getSentiment(message.message);
+      sentiment = await ai.getSentiment(message.message);
       console.log("Got sentiment: ", sentiment);
     } catch (error) {
       console.error('Error generating sentiment:', error);
@@ -88,7 +72,7 @@ wss.on('connection', function connection(ws) {
 
     if (message.message.includes(aiNick)) {
       try {
-        const aiMessage = await generateAiMessage();
+        const aiMessage = await ai.generateAiMessage(messages, aiNick);
         broadcastAiMessage(aiMessage);
       } catch (error) {
         console.error('Error generating AI message:', error);
@@ -96,56 +80,6 @@ wss.on('connection', function connection(ws) {
     }
   });
 });
-
-async function getSentiment(message) {
-  console.log("GETTING SENTIMENT");
-  const response = await openai.chat.completions.create({
-    model: 'gpt-3.5-turbo',
-    messages: [
-      {
-        role: 'system',
-        content: 'You are an expert in categorizing sentiment of a message. ' +
-          'You only return either "positive", "negative", "profane", or "neutral"'
-      },
-      {
-        role: 'user',
-        content: 'Categorize the sentiment of the following message (return output only one word): ' + message
-      }
-    ],
-    temperature: 0.3,
-  });
-
-  return response.choices[0].message.content;
-}
-
-async function generateAiMessage() {
-  console.log("GENERATING AI MESSAGE");
-
-  const last8messages = messages.get(8);
-  const formattedMessages = last8messages.map((message) => {
-    return `@${message.sender}: ${message.message}`;
-  }).join('\n');
-
-  const response = await openRouterAi.chat.completions.create({
-    model: 'gryphe/mythomist-7b',
-    messages: [
-      {
-        role: 'system',
-        content: `You are an user in a group chat. Your nick is "${aiNick}". ` +
-          'Have a conversation with others, reply to their messages, and comment on the chat\'s situation. ' +
-          'Be direct, funny, and toxic. Use profanity. Your message must be 4 sentences max.',
-      },
-      {
-        role: 'user',
-        content: formattedMessages + "\n" + aiNick + ":"
-      }
-    ],
-    temperature: 0.9,
-    max_tokens: 300,
-  });
-
-  return response.choices[0].message.content;
-}
 
 function broadcastAiMessage(content) {
   const message = {
@@ -164,9 +98,6 @@ function broadcastMessage(message) {
     client.send(JSON.stringify(message));
   });
 }
-
-// Serve any static files
-// app.use(express.static('path-to-your-react-app-build'));
 
 const port = process.env.PORT || 3001; //  Railway provides port as .env variable.
 server.listen(port, function listening() {
