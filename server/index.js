@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 // Make sure to set your OpenAI API key in an environment variable for security
 const openai = new OpenAI({
-  apiKey: "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",
+  apiKey: "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",
 });
 
 const app = express();
