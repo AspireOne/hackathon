@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import {constants} from "../lib/constants.ts";
 
 const username = `User${Math.floor(Math.random() * 1000000)}`;
 
@@ -34,7 +35,7 @@ const Chat: React.FC = () => {
 
   // Establish WebSocket connection
   useEffect(() => {
-    ws.current = new WebSocket('ws://localhost:3001');
+    ws.current = new WebSocket(constants.serverUrl);
     ws.current.onopen = () => console.log('WebSocket opened');
 
     ws.current.onmessage = (e) => {
