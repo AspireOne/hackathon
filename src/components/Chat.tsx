@@ -5,18 +5,20 @@ import { twMerge } from "tailwind-merge";
 
 export type Sentiment = "positive" | "negative" | "profane" | "neutral";
 
+const ws = new WebSocket(constants.wsServerUrl);
+
 // Component for Chat
 const Chat = (props: {nick: string}) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
-  const ws = useRef<WebSocket | null>(null);
 
   // Establish WebSocket connection
   useEffect(() => {
-    ws.current = new WebSocket(constants.wsServerUrl);
-    ws.current.onopen = () => console.log("WebSocket opened");
-    ws.current.onclose = () => console.log("WebSocket closed");
-    ws.current.onmessage = (e) => {
+    window.addEventListener("beforeunload", () => ws?.close());
+
+    ws.onopen = () => console.log("WebSocket opened");
+    ws.onclose = () => console.log("WebSocket closed");
+    ws.onmessage = (e) => {
       const data = JSON.parse(e.data);
 
       // When server sends initial messages.
@@ -46,19 +48,19 @@ const Chat = (props: {nick: string}) => {
       }
     };
 
-    return () => {
-      ws.current?.close();
-    };
+    /*return () => {
+      ws?.close();
+    };*/
   }, []);
 
   const sendMessage = () => {
-    if (input.trim() !== "" && ws.current) {
+    if (input.trim() !== "" && ws) {
       const messageToSend: Omit<ChatMessage, "id"> = {
         sender: props.nick,
         message: input,
         timestamp: new Date().toISOString(),
       };
-      ws.current.send(JSON.stringify(messageToSend));
+      ws.send(JSON.stringify(messageToSend));
       setInput("");
     }
   };

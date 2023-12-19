@@ -16,7 +16,7 @@ const rateLimiter = new RateLimiter(5, 5 * 1000);
 
 const app = express();
 const server = http.createServer(app);
-const wss = new WebSocketServer({ server });
+const wss = new WebSocketServer({ server, path: "/ws" });
 
 setInterval(async () => {
   const sendAiMessage = messages.getLast()?.sender && messages.getLast()?.sender !== aiNick;
@@ -24,7 +24,7 @@ setInterval(async () => {
     const aiMsg = await ai.generateAiMessage(messages, aiNick);
     broadcastAiMessage(aiMsg);
   }
-}, 20_000);
+}, 60_000);
 
 wss.on('connection', function connection(ws) {
   console.log('A new client connected!');

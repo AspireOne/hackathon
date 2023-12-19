@@ -39,7 +39,7 @@ async function generateAiMessage(messages, aiNick) {
   }).join('\n');
 
   const response = await openRouterAi.chat.completions.create({
-    model: 'gryphe/mythomist-7b',
+    model: 'mistralai/mixtral-8x7b-instruct',
     messages: [
       {
         role: 'system',
