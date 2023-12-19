@@ -4,6 +4,7 @@ import http from 'http';
 import OpenAI from 'openai';
 import { v4 as uuidv4 } from 'uuid';
 import 'dotenv/config'
+import {Messages} from "./Messages.js";
 
 // Make sure to set your OpenAI API key in an environment variable for security
 const openai = new OpenAI({
@@ -17,7 +18,7 @@ const openRouterAi = new OpenAI({
 
 const aiNick = "@pometlussy";
 
-const messages = [];
+const messages = new Messages({max: 50});
 
 const app = express();
 const server = http.createServer(app);
@@ -26,14 +27,14 @@ const wss = new WebSocketServer({ server });
 wss.on('connection', function connection(ws) {
   console.log('A new client connected!');
 
-  const last20Messages = messages.slice(-20);
+  const last20Messages = messages.get(20);
   console.log("sending", last20Messages);
   ws.send(JSON.stringify(last20Messages));
 
   ws.on('message', async function incoming(data) {
     const message = JSON.parse(data);
     console.log('received: %s', message);
-    messages.push(message);
+    messages.add(message);
 
     // Assign an ID to each message
     const messageId = uuidv4();
@@ -81,7 +82,7 @@ async function getSentiment(message) {
 }
 
 async function generateAiMessage() {
-  const last8messages = messages.slice(-8);
+  const last8messages = messages.get(8);
   const formattedMessages = last8messages.map((message) => {
     return `${message.sender}: ${message.message}`;
   }).join('\n');
@@ -117,7 +118,7 @@ function broadcastAiMessage(content) {
     timestamp: new Date().toISOString(),
   };
 
-  messages.push(message);
+  messages.add(message);
   broadcastMessage(message);
 }
 
