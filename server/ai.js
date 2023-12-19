@@ -33,7 +33,7 @@ async function getSentiment(message) {
 async function generateAiMessage(messages, aiNick) {
   console.log("GENERATING AI MESSAGE");
 
-  const last8messages = messages.get(8);
+  const last8messages = messages.get(15);
   const formattedMessages = last8messages.map((message) => {
     return `@${message.sender}: ${message.message}`;
   }).join('\n');
