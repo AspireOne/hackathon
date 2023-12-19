@@ -123,11 +123,28 @@ const Chat = (props: {nick: string}) => {
   );
 };
 
+function highlightUsernames(text: string) {
+  // Split the text by the pattern and include the pattern in the result
+  const parts = text.split(/(@\w+)/);
+  return parts.map((part, index) => {
+    // Check if the part matches the pattern
+    if (part.startsWith('@')) {
+      // Wrap the matched text in a span with a specific style
+      return (
+        <span key={index} className="text-blue-500">
+          {part}
+        </span>
+      );
+    }
+    return part; // Return the non-matching text as is
+  });
+}
+
 function Message(props: { msg: any }) {
   return (
     <div
       className={twMerge(
-        "message-item rounded m-5 p-3 bg-gray-200 border border-[5px]",
+        "message-item rounded m-5 p-3 bg-gray-200 border-[5px]",
         props.msg.sentiment && getBorderCss(props.msg.sentiment),
       )}
     >
@@ -140,11 +157,11 @@ function Message(props: { msg: any }) {
           </div>
         )}
       </div>
-      <p>{props.msg.message}</p>
+      {/* Use the highlightUsernames function to render the message with highlighted usernames */}
+      <p>{highlightUsernames(props.msg.message)}</p>
     </div>
   );
 }
-
 function InputTextbox(props: {
   value: string;
   onChange: React.ChangeEventHandler<HTMLInputElement>;

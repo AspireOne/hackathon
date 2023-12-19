@@ -9,6 +9,7 @@ const App: React.FC = () => {
     <div className="min-h-screen bg-gray-100">
       <header className="w-full py-5 bg-indigo-600 text-white text-center">
         <h1 className="text-4xl font-bold">WebSocket Chat</h1>
+        <p className={"text-gray-200 mt-2"}>Pometlussy is always here. Summon him using @pometlussy.</p>
       </header>
       <main className="flex justify-center p-10">
         <div className="w-4/6 bg-white shadow-lg rounded-lg overflow-hidden mr-4">
@@ -47,7 +48,7 @@ const ChooseNickModal = (props: {onNickSet: (nick: string) => void}) => {
         />
         <button
           onClick={onSubmit}
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4"
+          className="ml-3 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4"
         >
           Join
         </button>
