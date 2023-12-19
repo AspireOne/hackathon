@@ -1,13 +1,33 @@
-// Importing necessary libraries, configs, mongoDB course model
+import { WebSocketServer } from "ws";
 import express from 'express';
+import http from 'http';
 
-// Initializing express app
 const app = express();
+const server = http.createServer(app);
+const wss = new WebSocketServer({ server });
 
-const PORT = 5555;
+wss.on('connection', function connection(ws) {
+  console.log('A new client connected!');
 
-app.use(express.json());
+  ws.on('message', function incoming(message) {
+    console.log('received: %s', message);
 
-app.listen(PORT, () => {
-  console.log(`App is listening to port: ${PORT}`);
+    // Broadcast to everyone else.
+    wss.clients.forEach(function each(client) {
+      if (client !== ws && client.readyState === WebSocket.OPEN) {
+        client.send(message);
+      }
+    });
+  });
+
+  ws.on('close', () => {
+    console.log('Client disconnected');
+  });
+});
+
+// Serve any static files
+app.use(express.static('path-to-your-react-app-build'));
+
+server.listen(3001, function listening() {
+  console.log('Listening on %d', server.address().port);
 });
