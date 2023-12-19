@@ -61,7 +61,7 @@ async function handleRegularChatMessage(message) {
     })
     .catch(error => console.error('Error generating sentiment:', error))
 
-  if (message.message.includes(AI_NICK)) {
+  if (message.message?.includes(AI_NICK)) {
     ai.generateAiMessage(messages, AI_NICK)
       .then(aiMessage => broadcastAiMessage(aiMessage))
       .catch(error => console.error('Error generating AI message:', error))

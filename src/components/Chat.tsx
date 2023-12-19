@@ -13,6 +13,11 @@ ws.onclose = () => console.log("WebSocket closed");
 const Chat = (props: {nick: string}) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
+  const bottomOfChatRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    bottomOfChatRef.current?.scrollIntoView({behavior: "smooth"});
+  }, [messages]);
 
   // Establish WebSocket connection
   useEffect(() => {
@@ -77,6 +82,7 @@ const Chat = (props: {nick: string}) => {
         {messages.map((msg) => (
           <Message key={msg.id} msg={msg} />
         ))}
+        <div ref={bottomOfChatRef} id={"bottom-of-chat"}/>
       </div>
       <InputTextbox
         value={input}
