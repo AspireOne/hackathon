@@ -26,6 +26,10 @@ const wss = new WebSocketServer({ server });
 wss.on('connection', function connection(ws) {
   console.log('A new client connected!');
 
+  const last20Messages = messages.slice(-20);
+  console.log("sending", last20Messages);
+  ws.send(JSON.stringify(last20Messages));
+
   ws.on('message', async function incoming(data) {
     const message = JSON.parse(data);
     console.log('received: %s', message);

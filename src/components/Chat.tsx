@@ -55,9 +55,15 @@ const Chat = (props: {nick: string}) => {
   useEffect(() => {
     ws.current = new WebSocket(constants.wsServerUrl);
     ws.current.onopen = () => console.log("WebSocket opened");
-
+    ws.current.onclose = () => console.log("WebSocket closed");
     ws.current.onmessage = (e) => {
       const data = JSON.parse(e.data);
+
+      // When server sends initial messages.
+      if (Array.isArray(data)) {
+        setMessages(data);
+        return;
+      }
 
       // Check if incoming data has an id and sentiment (this is a sentiment analysis result)
       if ("id" in data && "sentiment" in data) {
@@ -79,8 +85,6 @@ const Chat = (props: {nick: string}) => {
         }
       }
     };
-
-    ws.current.onclose = () => console.log("WebSocket closed");
 
     return () => {
       ws.current?.close();
