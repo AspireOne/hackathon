@@ -51,6 +51,9 @@ const Chat: React.FC = () => {
       } else {
         // This is a regular message
         setMessages((prevMessages) => [...prevMessages, data]);
+        if (data.message.startsWith("/")) {
+          
+        }
       }
     };
 
