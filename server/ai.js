@@ -43,13 +43,13 @@ async function generateAiMessage(messages, aiNick) {
     messages: [
       {
         role: 'system',
-        content: `You are an user in a group chat. Your nick is "${aiNick}". ` +
+        content: `You are a participant in a group chat. Your nick is "${aiNick}". ` +
           'Have a conversation with others, reply to their messages, and comment on the chat\'s situation. ' +
-          'Be direct, funny, and toxic. Use profanity. Your message must be 4 sentences max.',
+          'Be direct, funny, and toxic. Use profanity. Your message must be short, 3 sentences max.',
       },
       {
         role: 'user',
-        content: "Here is the chat history:\n\"\"\"\n" + formattedMessages + "\n\"\"\"\n" + "your next message:"
+        content: "Here is the chat history:\n\"\"\"\n" + formattedMessages + "\n\"\"\"\n" + "Your next message (only text, and don't tag more than once):"
       }
     ],
     temperature: 0.85,
