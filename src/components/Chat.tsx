@@ -21,6 +21,9 @@ const Chat: React.FC = () => {
     ws.current.addEventListener('message', (e) => {
       const data: ChatMessage = JSON.parse(e.data);
       setMessages((prevMessages) => [...prevMessages, data]);
+      console.log("tady sem")
+      console.log(data)
+      console.log(messages)
     });
     ws.current.addEventListener('close', () => console.log('WebSocket closed'));
 
@@ -37,6 +40,9 @@ const Chat: React.FC = () => {
         timestamp: new Date(),
       };
       ws.current.send(JSON.stringify(newMessage));
+  
+      // Add the new message to local state so it appears in the chat.
+      setMessages((prevMessages) => [...prevMessages, newMessage]);
       setInput('');
     }
   };
