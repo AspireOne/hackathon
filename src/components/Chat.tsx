@@ -5,6 +5,7 @@ interface ChatMessage {
   sender: string;
   message: string;
   timestamp: Date;
+  
 }
 
 const Chat: React.FC = () => {
@@ -21,9 +22,6 @@ const Chat: React.FC = () => {
     ws.current.addEventListener('message', (e) => {
       const data: ChatMessage = JSON.parse(e.data);
       setMessages((prevMessages) => [...prevMessages, data]);
-      console.log("tady sem")
-      console.log(data)
-      console.log(messages)
     });
     ws.current.addEventListener('close', () => console.log('WebSocket closed'));
 
@@ -40,16 +38,14 @@ const Chat: React.FC = () => {
         timestamp: new Date(),
       };
       ws.current.send(JSON.stringify(newMessage));
-  
-      // Add the new message to local state so it appears in the chat.
       setMessages((prevMessages) => [...prevMessages, newMessage]);
       setInput('');
     }
   };
 
   return (
-    <div className="flex flex-col h-full bg-white">
-      <ul className="overflow-y-auto p-4">
+    <div className="flex flex-col h-full">
+      <ul className="flex-1 overflow-y-auto p-4">
         {messages.map((msg, index) => (
           <li key={index} className="mb-2 break-words">
             <strong className="font-bold">{msg.sender}</strong>
