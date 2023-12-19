@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {constants} from "../lib/constants.ts";
+import {CgDanger, CgSmile, CgSmileNeutral} from "react-icons/cg";
+import {FaRegFaceAngry} from "react-icons/fa6";
+import {twMerge} from "tailwind-merge";
 
 const username = `User${Math.floor(Math.random() * 1000000)}`;
 
@@ -14,16 +17,32 @@ interface ChatMessage {
   sentiment?: Sentiment; // Include the sentiment as optional
 }
 
-const getSentimentStyle = (sentiment?: Sentiment) => {
+const getBorderCss = (sentiment?: Sentiment) => {
   switch (sentiment) {
     case 'positive':
-      return 'bg-green-200';
+      return 'border-l-green-500';
     case 'negative':
-      return 'bg-gray-400';
+      return 'border-l-gray-700';
     case 'profane':
-      return 'bg-red-400';
+      return 'border-l-red-500';
+    case 'neutral':
+      return 'border-l-gray-200';
     default:
-      return 'bg-gray-200';
+      throw new Error('Invalid sentiment');
+  }}
+
+const getSentimentIcon = (sentiment?: Sentiment) => {
+  switch (sentiment) {
+    case 'positive':
+      return <CgSmile className={"text-green-500"} size={27}/>
+    case 'negative':
+      return <CgDanger className={"text-gray-700"} size={27}/>
+    case 'profane':
+      return <FaRegFaceAngry className={"text-red-500"} size={23}/>
+    case 'neutral':
+      return <CgSmileNeutral className={"text-gray-500"} size={27}/>
+   default:
+      throw new Error(`Invalid sentiment ${sentiment}`);
   }
 }
 
@@ -85,16 +104,28 @@ const Chat: React.FC = () => {
   // Render the chat UI
   return (
     <div className="chat-container flex flex-col justify-between border h-[70vh]">
-      <ul className="messages-list overflow-auto flex-grow">
+      <div className="messages-list overflow-auto flex-grow">
         {messages.map((msg) => (
-          <li key={msg.id} className={"message-item rounded m-5 p-3 " + getSentimentStyle(msg.sentiment)}>
-            <strong>{msg.sender}</strong>
-            <span> ({new Date(msg.timestamp).toLocaleTimeString()}): </span>
-            <i className={"ml-auto"}>{msg.sentiment}</i>
+          <div key={msg.id} className={twMerge(
+            "message-item rounded m-5 p-3 bg-gray-200 border border-[5px]",
+            msg.sentiment && getBorderCss(msg.sentiment)
+          )
+            }>
+            <div className={"flex flex-row gap-3 items-center"}>
+              <p className={"font-semibold text-blue-500"}>{msg.sender}</p>
+              <p>({new Date(msg.timestamp).toLocaleTimeString()})</p>
+              {
+                msg.sentiment && (
+                  <div className={"ml-auto"}>
+                    {getSentimentIcon(msg.sentiment)}
+                  </div>
+                )
+              }
+            </div>
             <p>{msg.message}</p>
-          </li>
+          </div>
         ))}
-      </ul>
+      </div>
       <div className="message-input-container border-t p-2 flex items-center bg-white sticky bottom-0">
         <input
           type="text"
